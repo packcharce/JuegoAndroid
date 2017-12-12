@@ -1,7 +1,7 @@
 <application>
   <component name="FindSettings">
-    <option name="customScope" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Carta.java'" />
-    <option name="defaultScopeName" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Carta.java'" />
-    <option name="SEARCH_SCOPE" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Carta.java'" />
+    <option name="customScope" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Cartas_Principal.java'" />
+    <option name="defaultScopeName" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Cartas_Principal.java'" />
+    <option name="SEARCH_SCOPE" value="File '[app] - ...\app\src\main\java\com\example\entregable3\cartitas_showcase\Cartas_Principal.java'" />
   </component>
 </application>
