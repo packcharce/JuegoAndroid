@@ -1,7 +1,7 @@
 <application>
   <component name="FindSettings">
-    <option name="customScope" value="Project 'Entregable3 - copia'" />
-    <option name="defaultScopeName" value="Project 'Entregable3 - copia'" />
-    <option name="SEARCH_SCOPE" value="Project 'Entregable3 - copia'" />
+    <option name="customScope" value="Module 'app'" />
+    <option name="defaultScopeName" value="Module 'app'" />
+    <option name="SEARCH_SCOPE" value="Module 'app'" />
   </component>
 </application>
