@@ -62,7 +62,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public final int TOTAL_ASTEROIDES=100*NIVEL;
+    public  int TOTAL_ASTEROIDES=100*NIVEL;
     private int enemigos_minuto=150*NIVEL;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
@@ -317,7 +317,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             if(isCargaUsada)
             for (byte i=0; i<NUMRAYOS; i++)
                 if(colisionRayo(a, posRayos[i][0], posRayos[i][1])){
-                    it_asteroide.remove();
+                    try {
+                        it_asteroide.remove();
+                    }catch (IllegalStateException is){}
                     listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
                     asteroides_destruidos++;
                 }
