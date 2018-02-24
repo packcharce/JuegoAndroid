@@ -14,13 +14,13 @@ public class Asteroide extends Thread {
 
     private static final String TAG = Asteroide.class.getSimpleName();
 
-    public float posX, posY;
+    float posX, posY;
 
-    public float velocidad;
+    private float velocidad;
 
-    public float direccion_horizontal;
-    public float direccion_vertical;
-    Double calcDireccion;
+    private float direccion_horizontal;
+    private float direccion_vertical;
+    private Double calcDireccion;
 
     private Juego juego;
 
@@ -126,13 +126,13 @@ public class Asteroide extends Thread {
         }
     }
 
-    public void actualizaCoordenadas(){
+    void actualizaCoordenadas(){
         posX+=direccion_horizontal*velocidad;
         posY+=direccion_vertical*velocidad;
         Log.i(TAG, "Posiciones: " +posX+", "+posY);
     }
 
-    public boolean fueraDeBordes(){
+    boolean fueraDeBordes(){
         boolean fuera=false;
         if(posX<=(-ancho()-1))
             fuera=true;
@@ -145,15 +145,15 @@ public class Asteroide extends Thread {
         return fuera;
     }
 
-    public void dibujar(Canvas c, Paint p){
+    void dibujar(Canvas c, Paint p){
         c.drawBitmap(juego.asteroide, posX, posY, p);
     }
 
-    public int ancho(){
+    int ancho(){
         return juego.asteroide.getWidth();
     }
 
-    public int alto(){
+    int alto(){
         return juego.asteroide.getHeight();
     }
 }
