@@ -1,6 +1,5 @@
 package com.juego.carlex.juegoandroid;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -25,8 +23,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -326,12 +322,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     }
 
     public boolean ColisionNave(Asteroide e){
-        /*int alto_mayor=e.alto()>planeta.getHeight()?e.alto():planeta.getHeight();
-        int ancho_mayor=e.ancho()>planeta.getWidth()?e.ancho():planeta.getWidth();
-        float diferenciaX=Math.abs(e.posX-posX_planeta);
-        float diferenciaY=Math.abs(e.posY-posY_planeta);
-        return diferenciaX<ancho_mayor-25 && diferenciaY<alto_mayor-25;*/
-
         Rect planet = new Rect((int)posX_planeta+20, (int)posY_planeta+20, (int)posX_planeta-20 + planeta.getWidth(), (int)posY_planeta-20 + planeta.getHeight());
         Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
 

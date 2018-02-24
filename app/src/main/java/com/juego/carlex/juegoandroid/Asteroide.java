@@ -10,7 +10,7 @@ import java.util.Random;
  * Created by Carlex on 20/02/2018.
  */
 
-public class Asteroide {
+public class Asteroide extends Thread {
 
     private static final String TAG = Asteroide.class.getSimpleName();
 
@@ -26,6 +26,20 @@ public class Asteroide {
 
     Asteroide(Juego j){
         juego=j;
+
+        this.start();
+    }
+
+    @Override
+    public void run() {
+        calculaDireccion();
+        CalculaCoordenadas();
+    }
+
+    /**
+     * Metodo que calcula la direccion del asteroide
+     */
+    private void calculaDireccion(){
         calcDireccion=Math.random();
 
         // Direccion: abajo a la derecha
@@ -48,7 +62,6 @@ public class Asteroide {
             direccion_vertical=(float)Math.random()*(-1);
             direccion_horizontal=(float)Math.random()*(-1);
         }
-        CalculaCoordenadas();
     }
 
     /**
