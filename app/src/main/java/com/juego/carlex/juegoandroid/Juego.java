@@ -62,8 +62,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public  int TOTAL_ASTEROIDES=100*NIVEL;
-    private int enemigos_minuto=150*NIVEL;
+    public  int TOTAL_ASTEROIDES=1000000;
+    private int enemigos_minuto=1000;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;
@@ -331,7 +331,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             }
 
         // Poner total_asteroides-10
-        if(asteroides_creados >= 10){
+        if(asteroides_creados == 10*NIVEL-10){
+            enemigos_minuto *= NIVEL;
             NIVEL++;
         }
     }
@@ -426,7 +427,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 }
             }
 
-            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos,0,30, myPaint);
+            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
             for(byte i=0; i<listaPoderes.length; i++) {
                 if (listaPoderes[i] != null)
                     canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
