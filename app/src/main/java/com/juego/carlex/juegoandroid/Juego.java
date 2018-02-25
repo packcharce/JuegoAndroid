@@ -1,6 +1,5 @@
 package com.juego.carlex.juegoandroid;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -25,8 +23,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,6 +35,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     private SurfaceHolder holder;
     public BucleJuego bucle;
     private Activity actividad;
+    int NIVEL=1;
 
 
     public int anchoPantalla;
@@ -65,8 +62,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public final int TOTAL_ASTEROIDES=200;
-    private int enemigos_minuto=30;
+    public  int TOTAL_ASTEROIDES=100*NIVEL;
+    private int enemigos_minuto=150*NIVEL;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;
@@ -232,24 +229,18 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     public void destruyeTodosAsteroides(){
         if(listaPoderes[1] != null) {
-            for (Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext(); ) {
-                Asteroide a = it_asteroide.next();
-                listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
-            }
-            asteroides_destruidos += listaAsteroides.size();
+            spawnRayos();
             listaPoderes[1].duracion--;
-            listaAsteroides.clear();
             listaPoderes[1] = null;
         }
+
     }
 
-
+    private boolean isCargaUsada = false;
     /**
      * Este método actualiza el estado del juego. Contiene la lógica del videojuego
      * generando los nuevos estados y dejando listo el sistema para un repintado.
      */
-
-
     public void actualizar() {
         if(!derrota){
 
@@ -270,10 +261,12 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             }
             // Estallar carga
             if (controles[CARGA].pulsado && listaPoderes[1] != null){
+                isCargaUsada = true;
                 destruyeTodosAsteroides();
             }
             Log.i(TAG, "Angulo: "+angulo_planeta);
         }
+
 
 
 
@@ -293,6 +286,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 }catch (Exception e){}
             }
         }
+
+        // Los rayos se mueven
+        if(isCargaUsada)
+            mueveRayos();
 
         // Colisiones
         for(Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext();){
@@ -317,22 +314,40 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                     }
                 }
             }
+            if(isCargaUsada)
+            for (byte i=0; i<NUMRAYOS; i++)
+                if(colisionRayo(a, posRayos[i][0], posRayos[i][1])){
+                    try {
+                        it_asteroide.remove();
+                    }catch (IllegalStateException is){}
+                    listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
+                    asteroides_destruidos++;
+                }
         }
         for(byte i=0; i<listaPoderes.length; i++)
             if(listaPoderes[i] != null && listaPoderes[i].duracion <= 0) {
                 listaPoderes[i].actualizaSkin(-1);
                 listaPoderes[i] = null;
             }
+
+        // Poner total_asteroides-10
+        if(asteroides_creados >= 10){
+            NIVEL++;
+        }
     }
 
     public boolean ColisionNave(Asteroide e){
-        /*int alto_mayor=e.alto()>planeta.getHeight()?e.alto():planeta.getHeight();
-        int ancho_mayor=e.ancho()>planeta.getWidth()?e.ancho():planeta.getWidth();
-        float diferenciaX=Math.abs(e.posX-posX_planeta);
-        float diferenciaY=Math.abs(e.posY-posY_planeta);
-        return diferenciaX<ancho_mayor-25 && diferenciaY<alto_mayor-25;*/
-
         Rect planet = new Rect((int)posX_planeta+20, (int)posY_planeta+20, (int)posX_planeta-20 + planeta.getWidth(), (int)posY_planeta-20 + planeta.getHeight());
+        Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
+
+        if(Rect.intersects(planet, aster))
+            return true;
+        else
+            return false;
+    }
+
+    private boolean colisionRayo(Asteroide e, double posXRayo, double posYRayo){
+        Rect planet = new Rect((int)posXRayo, (int)posYRayo, (int)posXRayo + rayos.getWidth(), (int)posYRayo + rayos.getHeight());
         Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
 
         if(Rect.intersects(planet, aster))
@@ -348,6 +363,42 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             if(listaExplosiones.size()>0)
                 listaExplosiones.remove(listaExplosiones.size()-1);
         }
+    }
+
+    private final int NUMRAYOS = 36, VELOCIDAD_RAYOS = 5;
+    private Bitmap rayos;
+    private double posRayos[][] = new double[NUMRAYOS][3];
+
+    /**
+     *  Metodo que spawnea los rayos del poder 'carga' y los pone direccion
+     *  [0] imagen, [1] posX, [2] posY, [3] angulo rayo
+     */
+    private boolean hayRayos=false;
+    private void spawnRayos(){
+        for(int i=0; i<NUMRAYOS; i++){
+            rayos = BitmapFactory.decodeResource(getResources(), R.drawable.rayo);
+            posRayos[i][0] = posX_planeta + planeta.getWidth()/2;
+            posRayos[i][1] = posY_planeta + planeta.getHeight()/2;
+            posRayos[i][2] = i*10;
+        }
+        hayRayos=true;
+    }
+    private void mueveRayos(){
+        for(int i=0; i<NUMRAYOS; i++){
+            posRayos[i][0] = posRayos[i][0] + Math.cos(Math.toRadians(posRayos[i][2])) * VELOCIDAD_RAYOS;
+            posRayos[i][1] = posRayos[i][1] + Math.sin(Math.toRadians(posRayos[i][2])) * VELOCIDAD_RAYOS;
+
+            if(posRayos[i][0]<=(-rayos.getWidth()-1))
+                isCargaUsada=false;
+            if(posRayos[i][0]>=(this.anchoPantalla+rayos.getWidth()+1))
+                isCargaUsada=false;
+            if(posRayos[i][1]<=(-rayos.getHeight()-1))
+                isCargaUsada=false;
+            if(posRayos[i][1]>=(this.altoPantalla+rayos.getHeight()+1))
+                isCargaUsada=false;
+        }
+        if(!isCargaUsada)
+            hayRayos=false;
     }
 
     /**
@@ -385,19 +436,17 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             matrix.preRotate(ang_bitmap_planeta, planeta.getWidth()/2, planeta.getHeight()/2);
             if (!derrota) {
                 matrix.postTranslate(posX_planeta, posY_planeta);
-
-//--------------------------------------------- Poner poderes activos------------------------------------------
-                /*if(listaPoderes[0] != null) {
-                    planeta = BitmapFactory.decodeResource(getResources(), R.drawable.tierra_wifi);
-
-                }*/
                 canvas.drawBitmap(planeta, matrix, null);
-
-
             }
-
+            // Dibujar asteroides
             for (Asteroide a : listaAsteroides)
                 a.dibujar(canvas, myPaint);
+
+            // Dibujar rayos
+            if(isCargaUsada)
+                for(byte i=0; i<NUMRAYOS; i++){
+                    canvas.drawBitmap(rayos, (float)posRayos[i][0], (float)posRayos[i][1], myPaint);
+                }
 
             // Explosion de nave
             if(exp != null)
@@ -508,8 +557,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 }
                 break;
                 case WifiManager.WIFI_STATE_DISABLED: {
+                    if(listaPoderes[0]!=null)
+                        listaPoderes[0].actualizaSkin(-1);
                     listaPoderes[0]=null;
-
                 }
                 break;
 

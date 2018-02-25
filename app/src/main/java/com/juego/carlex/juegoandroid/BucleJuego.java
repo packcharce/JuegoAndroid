@@ -25,7 +25,7 @@ class BucleJuego extends Thread {
     public void fin(){
         ejecutandose=false;
         try {
-            this.finalize();
+            super.finalize();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

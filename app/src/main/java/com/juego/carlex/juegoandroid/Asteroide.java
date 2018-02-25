@@ -10,24 +10,41 @@ import java.util.Random;
  * Created by Carlex on 20/02/2018.
  */
 
-public class Asteroide {
+public class Asteroide extends Thread {
 
     private static final String TAG = Asteroide.class.getSimpleName();
 
-    public float posX, posY;
+    float posX, posY;
 
-    public float velocidad;
+    private float velocidad;
 
-    public float direccion_horizontal;
-    public float direccion_vertical;
-    Double calcDireccion;
+    private double direccion_horizontal;
+    private double direccion_vertical;
+    private double calcDireccion;
 
     private Juego juego;
 
     Asteroide(Juego j){
         juego=j;
         calcDireccion=Math.random();
+        this.start();
+    }
 
+    @Override
+    public void run() {
+        CalculaCoordenadas();
+        calculaDireccion();
+        try {
+            this.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Metodo que calcula la direccion del asteroide
+     */
+    private void calculaDireccion(){
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
             direccion_vertical=(float)Math.random();
@@ -48,7 +65,6 @@ public class Asteroide {
             direccion_vertical=(float)Math.random()*(-1);
             direccion_horizontal=(float)Math.random()*(-1);
         }
-        CalculaCoordenadas();
     }
 
     /**
@@ -58,7 +74,8 @@ public class Asteroide {
 
     private void CalculaCoordenadas() {
         Random r= new Random();
-        velocidad=r.nextInt(10);
+        velocidad=r.nextInt(12);
+
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
             // Spawnea a la izq de la pantalla
@@ -113,13 +130,13 @@ public class Asteroide {
         }
     }
 
-    public void actualizaCoordenadas(){
+    void actualizaCoordenadas(){
         posX+=direccion_horizontal*velocidad;
         posY+=direccion_vertical*velocidad;
         Log.i(TAG, "Posiciones: " +posX+", "+posY);
     }
 
-    public boolean fueraDeBordes(){
+    boolean fueraDeBordes(){
         boolean fuera=false;
         if(posX<=(-ancho()-1))
             fuera=true;
@@ -132,15 +149,15 @@ public class Asteroide {
         return fuera;
     }
 
-    public void dibujar(Canvas c, Paint p){
+    void dibujar(Canvas c, Paint p){
         c.drawBitmap(juego.asteroide, posX, posY, p);
     }
 
-    public int ancho(){
+    int ancho(){
         return juego.asteroide.getWidth();
     }
 
-    public int alto(){
+    int alto(){
         return juego.asteroide.getHeight();
     }
 }
