@@ -18,30 +18,33 @@ public class Asteroide extends Thread {
 
     private float velocidad;
 
-    private float direccion_horizontal;
-    private float direccion_vertical;
-    private Double calcDireccion;
+    private double direccion_horizontal;
+    private double direccion_vertical;
+    private double calcDireccion;
 
     private Juego juego;
 
     Asteroide(Juego j){
         juego=j;
-
+        calcDireccion=Math.random();
         this.start();
     }
 
     @Override
     public void run() {
-        calculaDireccion();
         CalculaCoordenadas();
+        calculaDireccion();
+        try {
+            this.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Metodo que calcula la direccion del asteroide
      */
     private void calculaDireccion(){
-        calcDireccion=Math.random();
-
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
             direccion_vertical=(float)Math.random();
@@ -71,7 +74,8 @@ public class Asteroide extends Thread {
 
     private void CalculaCoordenadas() {
         Random r= new Random();
-        velocidad=r.nextInt(10);
+        velocidad=r.nextInt(12);
+
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
             // Spawnea a la izq de la pantalla
