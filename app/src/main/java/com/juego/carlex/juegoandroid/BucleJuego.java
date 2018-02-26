@@ -17,6 +17,7 @@ class BucleJuego extends Thread {
     private final static int	TIEMPO_FRAME = 1000 / MAX_FPS;
 
     private Juego juego;
+    public CargadorAsteroides ca;
 
     private boolean ejecutandose=true;
     private static final String TAG = Juego.class.getSimpleName();
@@ -34,6 +35,10 @@ class BucleJuego extends Thread {
     BucleJuego(SurfaceHolder sh, Juego s){
         juego=s;
         surfaceHolder=sh;
+
+        ca=new CargadorAsteroides(s);
+        ca.start();
+        while (ca.isAlive()){}
     }
 
     @Override

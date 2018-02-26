@@ -62,8 +62,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public  int TOTAL_ASTEROIDES=1000000;
-    private int enemigos_minuto=1000;
+    public  int TOTAL_ASTEROIDES=1000;
+    private int enemigos_minuto=10;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;
@@ -73,6 +73,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     // Lista Asteroides
     private ArrayList<Asteroide> listaAsteroides=new ArrayList<>();
+    protected Asteroide[] bufferAsteroides = new Asteroide[TOTAL_ASTEROIDES];
 
     // Explosion
     Bitmap explosion;
@@ -111,8 +112,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         posY_planeta = altoPantalla/2 - planeta.getHeight()/2;
 
         // Cargar los botones y los enemigos
-        CargaControles();
+
         CargaAsteroides();
+        CargaControles();
+
 
         // Crear receiver
         context.registerReceiver(WifiReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
@@ -142,6 +145,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     private void CargaAsteroides() {
         frames_para_nuevo_asteroide=bucle.MAX_FPS*60/enemigos_minuto;
         asteroide= BitmapFactory.decodeResource(getResources(), R.drawable.asteroide);
+        /*for (int i=0; i<TOTAL_ASTEROIDES; i++){
+            bufferAsteroides[i] = new Asteroide(this);
+        }*/
+
     }
 
     private void CargaControles() {
@@ -233,7 +240,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             listaPoderes[1].duracion--;
             listaPoderes[1] = null;
         }
-
     }
 
     private boolean isCargaUsada = false;
@@ -242,7 +248,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
      * generando los nuevos estados y dejando listo el sistema para un repintado.
      */
     public void actualizar() {
-        if(!derrota){
+        if(!derrota && bucle.ca.areAsteroidesCargados){
 
             // Rotacion del planeta
             if(controles[ROTAR_IZQ].pulsado){
@@ -266,8 +272,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             }
             Log.i(TAG, "Angulo: "+angulo_planeta);
         }
-
-
 
 
         if(frames_para_nuevo_asteroide == 0){
@@ -357,13 +361,23 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             return false;
     }
 
+    private int auxCuenta=0;
     private void CrearNuevoAsteroide() {
-        if(TOTAL_ASTEROIDES-asteroides_creados>0) {
+        /*if(TOTAL_ASTEROIDES-asteroides_creados>0) {
             listaAsteroides.add(new Asteroide(this));
             asteroides_creados++;
             if(listaExplosiones.size()>0)
                 listaExplosiones.remove(listaExplosiones.size()-1);
+        }*/
+
+        auxCuenta=asteroides_creados;
+        for(int i=auxCuenta; i<auxCuenta+10 && asteroides_creados<TOTAL_ASTEROIDES; i++){
+            listaAsteroides.add(bufferAsteroides[i]);
+            asteroides_creados++;
+            if(listaExplosiones.size()>0)
+                listaExplosiones.remove(listaExplosiones.size()-1);
         }
+
     }
 
     private final int NUMRAYOS = 36, VELOCIDAD_RAYOS = 5;
@@ -406,7 +420,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
      * Este método dibuja el siguiente paso de la animación correspondiente
      */
     public void renderizar(Canvas canvas) {
-        if (canvas != null) {
+        if (canvas != null && bucle.ca.areAsteroidesCargados) {
             canvas.drawColor(Color.BLACK);
             //Pinceles
             Paint myPaint = new Paint();
