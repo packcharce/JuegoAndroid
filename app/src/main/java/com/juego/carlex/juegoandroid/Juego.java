@@ -63,7 +63,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     //Asteroides
     Bitmap asteroide;
     public  int TOTAL_ASTEROIDES=1000000;
-    private int enemigos_minuto=1000;
+    private int enemigos_minuto=120;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;

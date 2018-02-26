@@ -73,8 +73,8 @@ public class Asteroide extends Thread {
      */
 
     private void CalculaCoordenadas() {
-        Random r= new Random();
-        velocidad=r.nextInt(12);
+        Random r = new Random();
+        velocidad=r.nextInt(10)+2;
 
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
@@ -110,9 +110,9 @@ public class Asteroide extends Thread {
                 posY=r.nextInt(juego.altoPantalla);
             }
             // Spawnea arriba
-            else{
-                posX=r.nextInt(juego.anchoPantalla);
-                posY=-alto();
+            else {
+                posX = r.nextInt(juego.anchoPantalla);
+                posY = -alto();
             }
         }
         // Direccion: arriba a la izquierda
@@ -128,6 +128,7 @@ public class Asteroide extends Thread {
                 posY=r.nextInt(juego.altoPantalla);
             }
         }
+        r = null;
     }
 
     void actualizaCoordenadas(){
