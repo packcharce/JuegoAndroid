@@ -62,8 +62,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public  int TOTAL_ASTEROIDES=100*NIVEL;
-    private int enemigos_minuto=150*NIVEL;
+    public  int TOTAL_ASTEROIDES=2000;
+    private final int enemigos_minuto=20;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;
@@ -73,6 +73,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     // Lista Asteroides
     private ArrayList<Asteroide> listaAsteroides=new ArrayList<>();
+    protected Asteroide[] bufferAsteroides = new Asteroide[TOTAL_ASTEROIDES];
 
     // Explosion
     Bitmap explosion;
@@ -85,7 +86,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     float posX_planeta;
     float posY_planeta;
     int angulo_planeta=270, ang_bitmap_planeta=0;
-    private final int VELOCIDAD_ROTACION = 5;
+    private final int VELOCIDAD_ROTACION = 10;
 
     // PowerUp activos
     // 0:WIFI 1:CARGA
@@ -111,8 +112,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         posY_planeta = altoPantalla/2 - planeta.getHeight()/2;
 
         // Cargar los botones y los enemigos
-        CargaControles();
+
         CargaAsteroides();
+        CargaControles();
+
 
         // Crear receiver
         context.registerReceiver(WifiReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
@@ -142,6 +145,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     private void CargaAsteroides() {
         frames_para_nuevo_asteroide=bucle.MAX_FPS*60/enemigos_minuto;
         asteroide= BitmapFactory.decodeResource(getResources(), R.drawable.asteroide);
+        /*for (int i=0; i<TOTAL_ASTEROIDES; i++){
+            bufferAsteroides[i] = new Asteroide(this);
+        }*/
+
     }
 
     private void CargaControles() {
@@ -233,7 +240,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             listaPoderes[1].duracion--;
             listaPoderes[1] = null;
         }
-
     }
 
     private boolean isCargaUsada = false;
@@ -242,7 +248,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
      * generando los nuevos estados y dejando listo el sistema para un repintado.
      */
     public void actualizar() {
-        if(!derrota){
+        if(!derrota && bucle.ca.areAsteroidesCargados){
 
             // Rotacion del planeta
             if(controles[ROTAR_IZQ].pulsado){
@@ -268,24 +274,11 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         }
 
 
-
-
         if(frames_para_nuevo_asteroide == 0){
             CrearNuevoAsteroide();
-            frames_para_nuevo_asteroide=bucle.MAX_FPS+60/enemigos_minuto;
+            frames_para_nuevo_asteroide=100;
         }
         frames_para_nuevo_asteroide--;
-
-        // Los asteroides se mueven
-        for(int i=0; i<listaAsteroides.size(); i++){
-            listaAsteroides.get(i).actualizaCoordenadas();
-            if(listaAsteroides.get(i).fueraDeBordes()){
-                try {
-                    listaAsteroides.remove(i);
-                    asteroides_destruidos++;
-                }catch (Exception e){}
-            }
-        }
 
         // Los rayos se mueven
         if(isCargaUsada)
@@ -294,6 +287,15 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         // Colisiones
         for(Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext();){
             Asteroide a = it_asteroide.next();
+
+            // Los asteroides se mueven
+            a.actualizaCoordenadas();
+            if(a.fueraDeBordes()){
+                try {
+                    it_asteroide.remove();
+                    asteroides_destruidos++;
+                }catch (Exception e){}
+            } else
             if(ColisionNave(a)){
 
                 // Si tiene poder activo (escudos)
@@ -330,8 +332,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 listaPoderes[i] = null;
             }
 
-        // Poner total_asteroides-10
-        if(asteroides_creados >= 10){
+        if(asteroides_creados == 10*NIVEL-10){
             NIVEL++;
         }
     }
@@ -341,6 +342,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
 
         if(Rect.intersects(planet, aster))
+            // TODO  true
             return true;
         else
             return false;
@@ -356,13 +358,26 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             return false;
     }
 
+    private int auxCuenta=0;
     private void CrearNuevoAsteroide() {
-        if(TOTAL_ASTEROIDES-asteroides_creados>0) {
+        /*if(TOTAL_ASTEROIDES-asteroides_creados>0) {
             listaAsteroides.add(new Asteroide(this));
             asteroides_creados++;
             if(listaExplosiones.size()>0)
                 listaExplosiones.remove(listaExplosiones.size()-1);
+        }*/
+        if(asteroides_creados - asteroides_destruidos <=40+NIVEL) {
+            for (int i = auxCuenta; i < auxCuenta+10 && auxCuenta < TOTAL_ASTEROIDES; i++) {
+                listaAsteroides.add(bufferAsteroides[i]);
+                asteroides_creados++;
+
+                if (listaExplosiones.size() > 0)
+                    listaExplosiones.remove(listaExplosiones.size() - 1);
+            }
+            auxCuenta+= 10;
         }
+
+
     }
 
     private final int NUMRAYOS = 36, VELOCIDAD_RAYOS = 5;
@@ -405,7 +420,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
      * Este método dibuja el siguiente paso de la animación correspondiente
      */
     public void renderizar(Canvas canvas) {
-        if (canvas != null) {
+        if (canvas != null && bucle.ca.areAsteroidesCargados) {
             canvas.drawColor(Color.BLACK);
             //Pinceles
             Paint myPaint = new Paint();
@@ -424,12 +439,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                         canvas.drawCircle(t.x, t.y, 100, myPaint);
                     }
                 }
-            }
-
-            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos,0,30, myPaint);
-            for(byte i=0; i<listaPoderes.length; i++) {
-                if (listaPoderes[i] != null)
-                    canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
             }
 
             Matrix matrix = new Matrix();
@@ -451,6 +460,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             // Explosion de nave
             if(exp != null)
                 exp.Dibujar(canvas, myPaint);
+
             // Explosion de asteroides
             for(Explosion e: listaExplosiones)
                 e.Dibujar(canvas, myPaint);
@@ -460,13 +470,19 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 controles[i].dibujar(canvas, myPaint);
             }
 
+            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
+            for(byte i=0; i<listaPoderes.length; i++) {
+                if (listaPoderes[i] != null)
+                    canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
+            }
+
             if (derrota) {
                 myPaint.setAlpha(0);
                 myPaint.setColor(Color.RED);
                 myPaint.setTextSize(anchoPantalla / 10);
-                canvas.drawText("DERROTA!!", 50, altoPantalla / 2 - 100, myPaint);
+                canvas.drawText("DERROTA!!", anchoPantalla/4, altoPantalla / 2 - 100, myPaint);
                 myPaint.setTextSize(anchoPantalla / 20);
-                canvas.drawText("La raza humana está condenada!!!!", 50, altoPantalla / 2 + 100, myPaint);
+                canvas.drawText("Uyyyy, pls try again!!!", anchoPantalla/4, altoPantalla / 2 + 100, myPaint);
                 fin();
             }
 

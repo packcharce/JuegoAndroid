@@ -10,13 +10,14 @@ import android.view.SurfaceHolder;
 
 class BucleJuego extends Thread {
     // Frames por segundo deseados
-    public final static int 	MAX_FPS = 60;
+    public final static int 	MAX_FPS = 30;
     // Máximo número de frames saltados
     private final static int	MAX_FRAMES_SALTADOS = 5;
     // El periodo de frames
     private final static int	TIEMPO_FRAME = 1000 / MAX_FPS;
 
     private Juego juego;
+    public CargadorAsteroides ca;
 
     private boolean ejecutandose=true;
     private static final String TAG = Juego.class.getSimpleName();
@@ -34,6 +35,12 @@ class BucleJuego extends Thread {
     BucleJuego(SurfaceHolder sh, Juego s){
         juego=s;
         surfaceHolder=sh;
+
+        ca=new CargadorAsteroides(s);
+        ca.start();
+        while (!ca.areAsteroidesCargados){
+            this.interrupt();
+        }
     }
 
     @Override

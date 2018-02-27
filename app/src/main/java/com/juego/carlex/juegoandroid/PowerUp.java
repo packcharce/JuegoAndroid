@@ -14,14 +14,14 @@ import android.graphics.Paint;
 public class PowerUp {
 
     private float posX, posY;
-    Bitmap powerUp;
+    private Bitmap powerUp;
     private String nombre;
     private int tipoPower;
     private Juego juego;
     private static final int WIFI=0;
     private static final int CARGA=1;
-    public int duracion;
-    boolean powerAct;
+    protected int duracion;
+    private boolean powerAct;
 
     private Context cont;
 
