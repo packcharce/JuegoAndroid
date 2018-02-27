@@ -10,7 +10,7 @@ import java.util.Random;
  * Created by Carlex on 20/02/2018.
  */
 
-public class Asteroide extends Thread {
+public class Asteroide /* extends Thread */{
 
     private static final String TAG = Asteroide.class.getSimpleName();
 
@@ -27,18 +27,20 @@ public class Asteroide extends Thread {
     Asteroide(Juego j){
         juego=j;
         calcDireccion=Math.random();
-        this.start();
-    /*}
+        //this.start();
 
-    @Override
-    public void run() { */
         CalculaCoordenadas();
         calculaDireccion();
+
+/*
+        @Override
+        public void run() { */
         /*try {
             this.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
+*/
     }
 
     /**
