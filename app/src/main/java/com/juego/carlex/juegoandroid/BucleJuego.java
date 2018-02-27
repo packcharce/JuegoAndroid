@@ -38,7 +38,9 @@ class BucleJuego extends Thread {
 
         ca=new CargadorAsteroides(s);
         ca.start();
-        while (!ca.areAsteroidesCargados){}
+        while (!ca.areAsteroidesCargados){
+            this.interrupt();
+        }
     }
 
     @Override

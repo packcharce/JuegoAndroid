@@ -86,7 +86,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     float posX_planeta;
     float posY_planeta;
     int angulo_planeta=270, ang_bitmap_planeta=0;
-    private final int VELOCIDAD_ROTACION = 5;
+    private final int VELOCIDAD_ROTACION = 10;
 
     // PowerUp activos
     // 0:WIFI 1:CARGA
@@ -296,7 +296,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                     asteroides_destruidos++;
                 }catch (Exception e){}
             } else
-            if(ColisionNave(a) && a != null){
+            if(ColisionNave(a)){
 
                 // Si tiene poder activo (escudos)
                 if(compruebaPoderes()) {
@@ -343,7 +343,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
         if(Rect.intersects(planet, aster))
             // TODO  true
-            return false;
+            return true;
         else
             return false;
     }
@@ -480,9 +480,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 myPaint.setAlpha(0);
                 myPaint.setColor(Color.RED);
                 myPaint.setTextSize(anchoPantalla / 10);
-                canvas.drawText("DERROTA!!", 50, altoPantalla / 2 - 100, myPaint);
+                canvas.drawText("DERROTA!!", anchoPantalla/4, altoPantalla / 2 - 100, myPaint);
                 myPaint.setTextSize(anchoPantalla / 20);
-                canvas.drawText("La raza humana está condenada!!!!", 50, altoPantalla / 2 + 100, myPaint);
+                canvas.drawText("Uyyyy, pls try again!!!", anchoPantalla/4, altoPantalla / 2 + 100, myPaint);
                 fin();
             }
 
