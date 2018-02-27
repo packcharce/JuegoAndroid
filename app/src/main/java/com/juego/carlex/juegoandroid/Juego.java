@@ -62,8 +62,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     //Asteroides
     Bitmap asteroide;
-    public  int TOTAL_ASTEROIDES=1000;
-    private int enemigos_minuto=10;
+    public  int TOTAL_ASTEROIDES=2000;
+    private final int enemigos_minuto=20;
     private int frames_para_nuevo_asteroide=0;
     private int asteroides_creados=0;
     private int asteroides_destruidos=0;
@@ -276,20 +276,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
         if(frames_para_nuevo_asteroide == 0){
             CrearNuevoAsteroide();
-            frames_para_nuevo_asteroide=bucle.MAX_FPS+60/enemigos_minuto;
+            frames_para_nuevo_asteroide=100;
         }
         frames_para_nuevo_asteroide--;
-
-        // Los asteroides se mueven
-        for(int i=0; i<listaAsteroides.size(); i++){
-            listaAsteroides.get(i).actualizaCoordenadas();
-            if(listaAsteroides.get(i).fueraDeBordes()){
-                try {
-                    listaAsteroides.remove(i);
-                    asteroides_destruidos++;
-                }catch (Exception e){}
-            }
-        }
 
         // Los rayos se mueven
         if(isCargaUsada)
@@ -298,7 +287,16 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         // Colisiones
         for(Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext();){
             Asteroide a = it_asteroide.next();
-            if(ColisionNave(a)){
+
+            // Los asteroides se mueven
+            a.actualizaCoordenadas();
+            if(a.fueraDeBordes()){
+                try {
+                    it_asteroide.remove();
+                    asteroides_destruidos++;
+                }catch (Exception e){}
+            } else
+            if(ColisionNave(a) && a != null){
 
                 // Si tiene poder activo (escudos)
                 if(compruebaPoderes()) {
@@ -334,9 +332,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 listaPoderes[i] = null;
             }
 
-        // Poner total_asteroides-10
         if(asteroides_creados == 10*NIVEL-10){
-            enemigos_minuto *= NIVEL;
             NIVEL++;
         }
     }
@@ -346,7 +342,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
 
         if(Rect.intersects(planet, aster))
-            return true;
+            // TODO  true
+            return false;
         else
             return false;
     }
@@ -369,14 +366,17 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             if(listaExplosiones.size()>0)
                 listaExplosiones.remove(listaExplosiones.size()-1);
         }*/
+        if(asteroides_creados - asteroides_destruidos <=40+NIVEL) {
+            for (int i = auxCuenta; i < auxCuenta+10 && auxCuenta < TOTAL_ASTEROIDES; i++) {
+                listaAsteroides.add(bufferAsteroides[i]);
+                asteroides_creados++;
 
-        auxCuenta=asteroides_creados;
-        for(int i=auxCuenta; i<auxCuenta+10 && asteroides_creados<TOTAL_ASTEROIDES; i++){
-            listaAsteroides.add(bufferAsteroides[i]);
-            asteroides_creados++;
-            if(listaExplosiones.size()>0)
-                listaExplosiones.remove(listaExplosiones.size()-1);
+                if (listaExplosiones.size() > 0)
+                    listaExplosiones.remove(listaExplosiones.size() - 1);
+            }
+            auxCuenta+= 10;
         }
+
 
     }
 
@@ -441,12 +441,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 }
             }
 
-            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
-            for(byte i=0; i<listaPoderes.length; i++) {
-                if (listaPoderes[i] != null)
-                    canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
-            }
-
             Matrix matrix = new Matrix();
             matrix.preRotate(ang_bitmap_planeta, planeta.getWidth()/2, planeta.getHeight()/2);
             if (!derrota) {
@@ -466,6 +460,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             // Explosion de nave
             if(exp != null)
                 exp.Dibujar(canvas, myPaint);
+
             // Explosion de asteroides
             for(Explosion e: listaExplosiones)
                 e.Dibujar(canvas, myPaint);
@@ -473,6 +468,12 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             myPaint.setAlpha(200);
             for (int i = 0; i < controles.length; i++) {
                 controles[i].dibujar(canvas, myPaint);
+            }
+
+            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
+            for(byte i=0; i<listaPoderes.length; i++) {
+                if (listaPoderes[i] != null)
+                    canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
             }
 
             if (derrota) {

@@ -28,17 +28,17 @@ public class Asteroide extends Thread {
         juego=j;
         calcDireccion=Math.random();
         this.start();
-    }
+    /*}
 
     @Override
-    public void run() {
+    public void run() { */
         CalculaCoordenadas();
         calculaDireccion();
-        try {
+        /*try {
             this.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**
