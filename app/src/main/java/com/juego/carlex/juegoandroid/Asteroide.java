@@ -2,7 +2,6 @@ package com.juego.carlex.juegoandroid;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -136,7 +135,7 @@ public class Asteroide /* extends Thread */{
     void actualizaCoordenadas(){
         posX+=direccion_horizontal*velocidad;
         posY+=direccion_vertical*velocidad;
-        Log.i(TAG, "Posiciones: " +posX+", "+posY);
+        //Log.i(TAG, "Posiciones: " +posX+", "+posY);
     }
 
     boolean fueraDeBordes(){

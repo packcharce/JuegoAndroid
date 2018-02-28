@@ -90,7 +90,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     // PowerUp activos
     // 0:WIFI 1:CARGA
-    PowerUp[] listaPoderes= new PowerUp[4];
+    PowerUp[] listaPoderes= new PowerUp[2];
 
     public Juego(Activity context){
         super(context);
@@ -169,7 +169,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
         // Boton Acelerar
         controles[CARGA]=new Boton(getContext(), anchoPantalla - controles[0].ancho(), controles[0].posY-controles[0].alto());
-        controles[CARGA].Cargar(R.drawable.flecha_izda);
+        controles[CARGA].Cargar(R.drawable.boton_rayo);
         controles[CARGA].nombre="Estallar Carga";
     }
 
@@ -252,12 +252,12 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
             // Rotacion del planeta
             if(controles[ROTAR_IZQ].pulsado){
-                angulo_planeta -= VELOCIDAD_ROTACION;
-                ang_bitmap_planeta -= VELOCIDAD_ROTACION;
+                angulo_planeta = (angulo_planeta-VELOCIDAD_ROTACION)%360;
+                ang_bitmap_planeta = (ang_bitmap_planeta-VELOCIDAD_ROTACION)%360;
             }
             if (controles[ROTAR_DCHA].pulsado){
-                angulo_planeta += VELOCIDAD_ROTACION;
-                ang_bitmap_planeta += VELOCIDAD_ROTACION;
+                angulo_planeta = (angulo_planeta + VELOCIDAD_ROTACION)%360;
+                ang_bitmap_planeta = (ang_bitmap_planeta + VELOCIDAD_ROTACION)%360;
 
             }
             // Moverse
@@ -270,7 +270,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 isCargaUsada = true;
                 destruyeTodosAsteroides();
             }
-            Log.i(TAG, "Angulo: "+angulo_planeta);
+            //Log.i(TAG, "Angulo: "+angulo_planeta);
         }
 
 
@@ -466,9 +466,11 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 e.Dibujar(canvas, myPaint);
 
             myPaint.setAlpha(200);
-            for (int i = 0; i < controles.length; i++) {
+            for (int i = 0; i < controles.length-1; i++) {
                 controles[i].dibujar(canvas, myPaint);
             }
+            if(listaPoderes[1] != null)
+                controles[3].dibujar(canvas, myPaint);
 
             canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
             for(byte i=0; i<listaPoderes.length; i++) {
@@ -548,7 +550,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         public void onReceive(Context context, Intent intent) {
             try {
                 int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING;
+                boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
                 if(isCharging){
                     anhadePoder(1);
                 }
