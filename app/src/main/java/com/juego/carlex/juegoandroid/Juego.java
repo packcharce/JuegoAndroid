@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -55,9 +56,11 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     private final int ROTAR_DCHA = 1;
     private final int MOVER = 2;
     private final int CARGA = 3;
+    private final byte RETURN = 4;
 
     private final float VELOCIDAD_PLANETA = 10;
     Boton controles[]=new Boton[4];
+    Boton salir;
 
 
     //Asteroides
@@ -171,6 +174,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         controles[CARGA]=new Boton(getContext(), anchoPantalla - controles[0].ancho(), controles[0].posY-controles[0].alto());
         controles[CARGA].Cargar(R.drawable.boton_rayo);
         controles[CARGA].nombre="Estallar Carga";
+
+        salir=new Boton(getContext(), anchoPantalla/2 - controles[0].ancho()/2, altoPantalla-controles[0].alto()-100);
+        salir.Cargar(R.drawable.flecha_izda);
     }
 
 
@@ -203,6 +209,11 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         boolean retry = true;
         while (retry) {
             try {
+                Context c= getContext();
+                SharedPreferences sharedPref = c.getSharedPreferences("ContadorPuntos", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt("puntos", asteroides_destruidos);
+                editor.apply();
                 fin();
                 bucle.join();
                 retry = false;
@@ -248,92 +259,97 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
      * generando los nuevos estados y dejando listo el sistema para un repintado.
      */
     public void actualizar() {
-        if(!derrota && bucle.ca.areAsteroidesCargados){
+        if (derrota && salir.pulsado)
+            fin();
+        if (!derrota && bucle.ca.areAsteroidesCargados) {
 
             // Rotacion del planeta
-            if(controles[ROTAR_IZQ].pulsado){
-                angulo_planeta = (angulo_planeta-VELOCIDAD_ROTACION)%360;
-                ang_bitmap_planeta = (ang_bitmap_planeta-VELOCIDAD_ROTACION)%360;
+            if (controles[ROTAR_IZQ].pulsado) {
+                angulo_planeta = (angulo_planeta - VELOCIDAD_ROTACION) % 360;
+                ang_bitmap_planeta = (ang_bitmap_planeta - VELOCIDAD_ROTACION) % 360;
             }
-            if (controles[ROTAR_DCHA].pulsado){
-                angulo_planeta = (angulo_planeta + VELOCIDAD_ROTACION)%360;
-                ang_bitmap_planeta = (ang_bitmap_planeta + VELOCIDAD_ROTACION)%360;
+            if (controles[ROTAR_DCHA].pulsado) {
+                angulo_planeta = (angulo_planeta + VELOCIDAD_ROTACION) % 360;
+                ang_bitmap_planeta = (ang_bitmap_planeta + VELOCIDAD_ROTACION) % 360;
 
             }
             // Moverse
-            if (controles[MOVER].pulsado){
+            if (controles[MOVER].pulsado) {
                 posX_planeta += Math.cos(Math.toRadians(angulo_planeta)) * VELOCIDAD_PLANETA;
                 posY_planeta += Math.sin(Math.toRadians(angulo_planeta)) * VELOCIDAD_PLANETA;
             }
             // Estallar carga
-            if (controles[CARGA].pulsado && listaPoderes[1] != null){
+            if (controles[CARGA].pulsado && listaPoderes[1] != null) {
                 isCargaUsada = true;
                 destruyeTodosAsteroides();
             }
             //Log.i(TAG, "Angulo: "+angulo_planeta);
-        }
 
 
-        if(frames_para_nuevo_asteroide == 0){
-            CrearNuevoAsteroide();
-            frames_para_nuevo_asteroide=100;
-        }
-        frames_para_nuevo_asteroide--;
 
-        // Los rayos se mueven
-        if(isCargaUsada)
-            mueveRayos();
-
-        // Colisiones
-        for(Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext();){
-            Asteroide a = it_asteroide.next();
-
-            // Los asteroides se mueven
-            a.actualizaCoordenadas();
-            if(a.fueraDeBordes()){
-                try {
-                    it_asteroide.remove();
-                    asteroides_destruidos++;
-                }catch (Exception e){}
-            } else
-            if(ColisionNave(a)){
-
-                // Si tiene poder activo (escudos)
-                if(compruebaPoderes()) {
-
-                    for(byte i=0; i<listaPoderes.length; i++) {
-                        if(listaPoderes[i] != null)
-                            switch (listaPoderes[i].getTipoPower()){
-                                // Buscar poder wifi
-                                case 0:
-                                    listaPoderes[i].duracion--;
-                                    listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
-                                    it_asteroide.remove();
-                                    asteroides_destruidos++;
-                                    break;
-                                default:break;
-                            }
-                    }
-                }
+            if (frames_para_nuevo_asteroide == 0) {
+                CrearNuevoAsteroide();
+                frames_para_nuevo_asteroide = 100;
             }
-            if(isCargaUsada)
-            for (byte i=0; i<NUMRAYOS; i++)
-                if(colisionRayo(a, posRayos[i][0], posRayos[i][1])){
+            frames_para_nuevo_asteroide--;
+
+            // Los rayos se mueven
+            if (isCargaUsada)
+                mueveRayos();
+
+            // Colisiones
+            for (Iterator<Asteroide> it_asteroide = listaAsteroides.iterator(); it_asteroide.hasNext(); ) {
+                Asteroide a = it_asteroide.next();
+
+                // Los asteroides se mueven
+                a.actualizaCoordenadas();
+                if (a.fueraDeBordes()) {
                     try {
                         it_asteroide.remove();
-                    }catch (IllegalStateException is){}
-                    listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
-                    asteroides_destruidos++;
-                }
-        }
-        for(byte i=0; i<listaPoderes.length; i++)
-            if(listaPoderes[i] != null && listaPoderes[i].duracion <= 0) {
-                listaPoderes[i].actualizaSkin(-1);
-                listaPoderes[i] = null;
-            }
+                        asteroides_destruidos++;
+                    } catch (Exception e) {
+                    }
+                } else if (ColisionNave(a)) {
 
-        if(asteroides_creados == 10*NIVEL-10){
-            NIVEL++;
+                    // Si tiene poder activo (escudos)
+                    if (compruebaPoderes()) {
+
+                        for (byte i = 0; i < listaPoderes.length; i++) {
+                            if (listaPoderes[i] != null)
+                                switch (listaPoderes[i].getTipoPower()) {
+                                    // Buscar poder wifi
+                                    case 0:
+                                        listaPoderes[i].duracion--;
+                                        listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
+                                        it_asteroide.remove();
+                                        asteroides_destruidos++;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                        }
+                    }
+                }
+                if (isCargaUsada)
+                    for (byte i = 0; i < NUMRAYOS; i++)
+                        if (colisionRayo(a, posRayos[i][0], posRayos[i][1])) {
+                            try {
+                                it_asteroide.remove();
+                            } catch (IllegalStateException is) {
+                            }
+                            listaExplosiones.add(new Explosion(this, a.posX - AJUSTE_BITMAP_EXPLOSION, a.posY - AJUSTE_BITMAP_EXPLOSION));
+                            asteroides_destruidos++;
+                        }
+            }
+            for (byte i = 0; i < listaPoderes.length; i++)
+                if (listaPoderes[i] != null && listaPoderes[i].duracion <= 0) {
+                    listaPoderes[i].actualizaSkin(-1);
+                    listaPoderes[i] = null;
+                }
+
+            if (asteroides_creados == 10 * NIVEL - 10) {
+                NIVEL++;
+            }
         }
     }
 
@@ -472,7 +488,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             if(listaPoderes[1] != null)
                 controles[3].dibujar(canvas, myPaint);
 
-            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos + "Creados: "+ asteroides_creados + "Nivel: "+NIVEL,0,30, myPaint);
+            canvas.drawText("Asteroides esquivados: "+asteroides_destruidos,0,30, myPaint);
             for(byte i=0; i<listaPoderes.length; i++) {
                 if (listaPoderes[i] != null)
                     canvas.drawText("Usos de " + listaPoderes[i].getNombre() + ": " + listaPoderes[i].duracion, 0, 60 + 30 * i, myPaint);
@@ -482,10 +498,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 myPaint.setAlpha(0);
                 myPaint.setColor(Color.RED);
                 myPaint.setTextSize(anchoPantalla / 10);
-                canvas.drawText("DERROTA!!", anchoPantalla/4, altoPantalla / 2 - 100, myPaint);
+                canvas.drawText("DERROTA!!", anchoPantalla/4, altoPantalla / 2 - 200, myPaint);
                 myPaint.setTextSize(anchoPantalla / 20);
                 canvas.drawText("Uyyyy, pls try again!!!", anchoPantalla/4, altoPantalla / 2 + 100, myPaint);
-                fin();
+                salir.dibujar(canvas, myPaint);
             }
 
         }
@@ -513,6 +529,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 //se comprueba si se ha pulsado
                 for(int i=0;i<controles.length;i++)
                     controles[i].comprueba_pulsado(x,y);
+                salir.comprueba_pulsado(x,y);
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
@@ -523,6 +540,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 //se comprueba si se ha soltado el botón
                 for(int i=0;i<controles.length;i++)
                     controles[i].comprueba_soltado(toques);
+                salir.comprueba_soltado(toques);
                 break;
 
             case MotionEvent.ACTION_UP:
@@ -533,6 +551,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
                 //se comprueba si se ha soltado el botón
                 for(int i=0;i<controles.length;i++)
                     controles[i].comprueba_soltado(toques);
+                salir.comprueba_soltado(toques);
                 break;
         }
 
@@ -541,8 +560,7 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
 
     public void fin() {
         bucle.fin();
-        planeta.recycle();
-        asteroide.recycle();
+
     }
 
     private BroadcastReceiver cargaReceiver = new BroadcastReceiver() {

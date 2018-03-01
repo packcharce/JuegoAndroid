@@ -1,7 +1,6 @@
 package com.juego.carlex.juegoandroid;
 
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 /**
@@ -24,12 +23,10 @@ class BucleJuego extends Thread {
     private SurfaceHolder surfaceHolder;
 
     public void fin(){
-        ejecutandose=false;
-        try {
-            super.finalize();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+
+            ejecutandose = false;
+
+        //juego = null;
     }
 
     BucleJuego(SurfaceHolder sh, Juego s){
@@ -41,12 +38,17 @@ class BucleJuego extends Thread {
         while (!ca.areAsteroidesCargados){
             this.interrupt();
         }
+        try {
+            ca.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
         Canvas canvas;
-        Log.d(TAG, "Comienza el game loop");
+        //Log.d(TAG, "Comienza el game loop");
 
 
         long tiempoComienzo;		// Tiempo en el que el ciclo comenzó
