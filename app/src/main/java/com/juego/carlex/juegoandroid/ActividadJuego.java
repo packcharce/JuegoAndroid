@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * Created by Carlex on 20/02/2018.
+ * Actividad que pone a pantalla completa el juego
  */
 
 public class ActividadJuego extends Activity {
@@ -20,7 +20,6 @@ public class ActividadJuego extends Activity {
         j=new Juego(this);
         hideSystemUI();
         setContentView(j);
-
     }
 
     private void hideSystemUI() {
@@ -58,11 +57,5 @@ public class ActividadJuego extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_actividad_juego, menu);
         return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        j.fin();
-        super.onDestroy();
     }
 }

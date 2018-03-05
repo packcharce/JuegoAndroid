@@ -1,13 +1,14 @@
 package com.juego.carlex.juegoandroid;
 
 /**
- * Created by Carlex on 26/02/2018.
+ * Clase hilo que solo crea los asteroides y los guarda en un array
+ * para aliviar el peso del hilo principal
  */
 
 class CargadorAsteroides extends Thread {
 
-    private int numAstCargados=0;
     protected boolean areAsteroidesCargados=false;
+    private int numAstCargados = 0;
     private Juego juego;
     public CargadorAsteroides(Juego j){
         juego=j;

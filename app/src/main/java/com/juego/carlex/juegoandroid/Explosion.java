@@ -5,14 +5,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 /**
- * Created by Carlex on 20/02/2018.
+ * Clase con lo necesario para crear y dibujar las explosiones
  */
 
 class Explosion {
 
+    public float coordenada_x, coordenada_y; //coordenadas donde se dibuja el control
     private int ancho_sprite;
     private int alto_sprite;
-    public float coordenada_x, coordenada_y; //coordenadas donde se dibuja el control
     private Juego juego;
     private int estado;
 

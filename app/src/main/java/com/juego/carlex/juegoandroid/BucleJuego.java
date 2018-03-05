@@ -4,31 +4,32 @@ import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
 /**
- * Created by Carlex on 20/02/2018.
+ * Clase hilo principal que controla el juego
  */
 
 class BucleJuego extends Thread {
+
     // Frames por segundo deseados
     public final static int 	MAX_FPS = 30;
+
     // Máximo número de frames saltados
     private final static int	MAX_FRAMES_SALTADOS = 5;
+
     // El periodo de frames
     private final static int	TIEMPO_FRAME = 1000 / MAX_FPS;
-
-    private Juego juego;
-    public CargadorAsteroides ca;
-
-    private boolean ejecutandose=true;
     private static final String TAG = Juego.class.getSimpleName();
+    public CargadorAsteroides ca;
+    private Juego juego;
+    private boolean ejecutandose=true;
     private SurfaceHolder surfaceHolder;
 
-    public void fin(){
-
-            ejecutandose = false;
-
-        //juego = null;
-    }
-
+    /**
+     * Constructor que llama al creador de asteroides.
+     * Magia de hilos que parece que funciona
+     *
+     * @param sh
+     * @param s
+     */
     BucleJuego(SurfaceHolder sh, Juego s){
         juego=s;
         surfaceHolder=sh;
@@ -45,6 +46,13 @@ class BucleJuego extends Thread {
         }
     }
 
+    public void fin() {
+        ejecutandose = false;
+    }
+
+    /**
+     * Metodo principal con el bucle del juego
+     */
     @Override
     public void run() {
         Canvas canvas;

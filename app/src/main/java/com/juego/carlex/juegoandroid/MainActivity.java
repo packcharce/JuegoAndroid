@@ -9,20 +9,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Menu chustero para mostrar el high score y que parezca una app tó pro
+ */
 public class MainActivity extends AppCompatActivity {
 
-
+    TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences sh = getSharedPreferences("ContadorPuntos", Context.MODE_PRIVATE);
-        int i = sh.getInt("puntos", 0);
-        TextView tv=findViewById(R.id.textView);
-        tv.setText("High score: " + String.valueOf(i));
-
+        tv = findViewById(R.id.textView);
 
         Button b1=findViewById(R.id.button3);
         b1.setOnClickListener(new View.OnClickListener() {
@@ -37,9 +36,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
+        //Toast.makeText(this, "Hola", Toast.LENGTH_LONG).show();
         SharedPreferences sh = getSharedPreferences("ContadorPuntos", Context.MODE_PRIVATE);
         int i = sh.getInt("puntos", 0);
-        TextView tv=findViewById(R.id.textView);
         tv.setText("High score: " + String.valueOf(i));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.finishAffinity();
     }
 }

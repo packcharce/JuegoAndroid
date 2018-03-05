@@ -9,7 +9,7 @@ import android.graphics.Paint;
 import java.util.ArrayList;
 
 /**
- * Created by Carlex on 20/02/2018.
+ * Clase con los metodos necesarios para crear y dibujar los controles
  */
 
 class Boton {

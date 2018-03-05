@@ -6,11 +6,12 @@ import android.graphics.Paint;
 import java.util.Random;
 
 /**
- * Created by Carlex on 20/02/2018.
+ * Clase con lo necesario para dibujar y controlar los asteroides
  */
 
-public class Asteroide /* extends Thread */{
+public class Asteroide {
 
+    // Pal debugger
     private static final String TAG = Asteroide.class.getSimpleName();
 
     float posX, posY;
@@ -26,20 +27,9 @@ public class Asteroide /* extends Thread */{
     Asteroide(Juego j){
         juego=j;
         calcDireccion=Math.random();
-        //this.start();
 
         CalculaCoordenadas();
         calculaDireccion();
-
-/*
-        @Override
-        public void run() { */
-        /*try {
-            this.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-*/
     }
 
     /**
@@ -132,12 +122,20 @@ public class Asteroide /* extends Thread */{
         r = null;
     }
 
+    /**
+     * Metodo que actualiza las coordenadas del asteroide en el plano
+     */
     void actualizaCoordenadas(){
         posX+=direccion_horizontal*velocidad;
         posY+=direccion_vertical*velocidad;
         //Log.i(TAG, "Posiciones: " +posX+", "+posY);
     }
 
+    /**
+     * Metodo que controla si un asteroide se ha salido del los limites, para borrarlo
+     *
+     * @return
+     */
     boolean fueraDeBordes(){
         boolean fuera=false;
         if(posX<=(-ancho()-1))
