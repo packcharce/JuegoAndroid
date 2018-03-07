@@ -23,11 +23,30 @@ public class MainActivity extends AppCompatActivity {
 
         tv = findViewById(R.id.textView);
 
-        Button b1=findViewById(R.id.button3);
+        Button b1=findViewById(R.id.btnFacil);
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i= new Intent(MainActivity.this, ActividadJuego.class);
+                i.putExtra("dificultad", 0);
+                startActivity(i);
+            }
+        });
+        Button b2=findViewById(R.id.btnMedio);
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i= new Intent(MainActivity.this, ActividadJuego.class);
+                i.putExtra("dificultad", 1);
+                startActivity(i);
+            }
+        });
+        Button b3=findViewById(R.id.btnHard);
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i= new Intent(MainActivity.this, ActividadJuego.class);
+                i.putExtra("dificultad", 2);
                 startActivity(i);
             }
         });

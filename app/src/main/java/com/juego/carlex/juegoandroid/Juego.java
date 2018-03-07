@@ -39,10 +39,12 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     private final int ROTAR_DCHA = 1;
     private final int MOVER = 2;
     private final int CARGA = 3;
-    private final float VELOCIDAD_PLANETA = 10;
+    private float velocidad_planeta;
     private final int enemigos_minuto = 20;
     private final Short AJUSTE_BITMAP_EXPLOSION = 192;
     private final int VELOCIDAD_ROTACION = 10;
+    public byte dificultad;
+
     /**
      * Metodo que spawnea los rayos del poder 'carga' y los pone direccion
      * [0] imagen, [1] posX, [2] posY, [3] angulo rayo
@@ -56,37 +58,41 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     int NIVEL = 1;
     boolean hayToque = false;
     Boton controles[]=new Boton[4];
+
     //Asteroides
     Bitmap asteroide;
+
     // Explosion
     Bitmap explosion;
     Explosion exp;
     ArrayList<Explosion> listaExplosiones = new ArrayList<>();
+
     // Planeta
     Bitmap planeta;
     float posX_planeta;
     float posY_planeta;
     int angulo_planeta=270, ang_bitmap_planeta=0;
+
     // PowerUp activos
     // 0:WIFI 1:CARGA
     PowerUp[] listaPoderes= new PowerUp[2];
     Context c;
     private SurfaceHolder holder;
     private Activity actividad;
+
     // Array de toques de pantalla
     private ArrayList<Toque> toques = new ArrayList<>();
     private int frames_para_nuevo_asteroide = 0;
     private int asteroides_creados = 0;
     private int asteroides_destruidos = 0;
+
     // Fin del juego
     private boolean derrota = false;
+
     // Lista Asteroides
     private ArrayList<Asteroide> listaAsteroides = new ArrayList<>();
     private boolean isCargaUsada = false;
-    /**
-     * Metodo magico que extrae 40+NIVEL asteroides del buffer
-     * y a su vez borra las explosiones existentes en pantalla
-     */
+
     private int auxCuenta = 0;
     private Bitmap rayos;
     private double posRayos[][] = new double[NUMRAYOS][3];
@@ -176,6 +182,9 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         // Listener de pantalla
         setOnTouchListener(this);
 
+    }
+    public void setVelocidad_planeta(float velocidad_planeta) {
+        this.velocidad_planeta = velocidad_planeta;
     }
 
     /**
@@ -340,8 +349,8 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
             }
             // Moverse
             if (controles[MOVER].pulsado) {
-                posX_planeta += Math.cos(Math.toRadians(angulo_planeta)) * VELOCIDAD_PLANETA;
-                posY_planeta += Math.sin(Math.toRadians(angulo_planeta)) * VELOCIDAD_PLANETA;
+                posX_planeta += Math.cos(Math.toRadians(angulo_planeta)) * velocidad_planeta;
+                posY_planeta += Math.sin(Math.toRadians(angulo_planeta)) * velocidad_planeta;
             }
             // Estallar carga
             if (controles[CARGA].pulsado && listaPoderes[1] != null) {
@@ -451,6 +460,10 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
         return Rect.intersects(planet, aster);
     }
 
+    /**
+     * Metodo magico que extrae 40+NIVEL asteroides del buffer
+     * y a su vez borra las explosiones existentes en pantalla
+     */
     private void CrearNuevoAsteroide() {
         if(asteroides_creados - asteroides_destruidos <=40+NIVEL) {
             for (int i = auxCuenta; i < auxCuenta+10 && auxCuenta < TOTAL_ASTEROIDES; i++) {

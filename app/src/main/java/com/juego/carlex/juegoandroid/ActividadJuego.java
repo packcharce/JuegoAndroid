@@ -1,6 +1,7 @@
 package com.juego.carlex.juegoandroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,6 +21,14 @@ public class ActividadJuego extends Activity {
         j=new Juego(this);
         hideSystemUI();
         setContentView(j);
+
+        Intent i = getIntent();
+        j.dificultad = (byte) i.getIntExtra("dificultad", 0);
+
+        if(j.dificultad == 2)
+            j.setVelocidad_planeta(30);
+        else
+            j.setVelocidad_planeta(10);
     }
 
     private void hideSystemUI() {

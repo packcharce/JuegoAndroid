@@ -7,10 +7,11 @@ package com.juego.carlex.juegoandroid;
 
 class CargadorAsteroides extends Thread {
 
-    protected boolean areAsteroidesCargados=false;
+    boolean areAsteroidesCargados=false;
     private int numAstCargados = 0;
     private Juego juego;
-    public CargadorAsteroides(Juego j){
+
+    CargadorAsteroides(Juego j){
         juego=j;
     }
 

@@ -10,7 +10,7 @@
     tools:context="com.juego.carlex.juegoandroid.MainActivity">
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/btnFacil"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/buttonshape"
@@ -18,14 +18,35 @@
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        android:text="Jugar"
+        android:text="Facil"
         android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/btnMedio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/buttonshape"
+        android:text="Medio"
+        android:textColor="@android:color/background_light"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/btnHard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonshape"
+        android:text="Dificil"
+        android:textColor="@android:color/background_light"
         android:textSize="30sp" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_marginTop="10dp"
+        android:gravity="center" />
 
 </LinearLayout>

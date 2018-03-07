@@ -26,16 +26,30 @@ public class Asteroide {
 
     Asteroide(Juego j){
         juego=j;
-        calcDireccion=Math.random();
 
+        calcDireccion=Math.random();
         CalculaCoordenadas();
-        calculaDireccion();
+        switch (juego.dificultad){
+            case 0:
+                calculaDireccionEasy();
+                break;
+            case 1:
+            case 2:
+                calculaDireccionMedio();
+                break;
+        }
+
     }
 
     /**
      * Metodo que calcula la direccion del asteroide
      */
-    private void calculaDireccion(){
+    private void calculaDireccionMedio(){
+        double modulo= Math.abs(Math.sqrt((juego.posX_planeta - posX)*(juego.posX_planeta - posX)+(juego.posY_planeta - posY)*(juego.posY_planeta - posY)));
+        direccion_horizontal = (juego.posX_planeta - posX)/modulo;
+        direccion_vertical = (juego.posY_planeta - posY)/modulo;
+    }
+    private void calculaDireccionEasy(){
         // Direccion: abajo a la derecha
         if(calcDireccion<0.25){
             direccion_vertical=(float)Math.random();
@@ -119,13 +133,14 @@ public class Asteroide {
                 posY=r.nextInt(juego.altoPantalla);
             }
         }
-        r = null;
     }
 
     /**
      * Metodo que actualiza las coordenadas del asteroide en el plano
      */
     void actualizaCoordenadas(){
+        if(juego.dificultad == 2)
+            calculaDireccionMedio();
         posX+=direccion_horizontal*velocidad;
         posY+=direccion_vertical*velocidad;
         //Log.i(TAG, "Posiciones: " +posX+", "+posY);
