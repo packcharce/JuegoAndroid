@@ -49,7 +49,7 @@ class Boton {
     }
 
     public void Cargar(int recurso) {
-        imagen= BitmapFactory.decodeResource(mContexto.getResources(), recurso);
+        imagen = BitmapFactory.decodeResource(mContexto.getResources(), recurso);
     }
 
     public int ancho() {
