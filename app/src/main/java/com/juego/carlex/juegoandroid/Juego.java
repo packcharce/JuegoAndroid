@@ -441,8 +441,6 @@ class Juego extends SurfaceView implements SurfaceHolder.Callback, SurfaceView.O
     public boolean ColisionNave(Asteroide e){
         Rect planet = new Rect((int)posX_planeta+20, (int)posY_planeta+20, (int)posX_planeta-20 + planeta.getWidth(), (int)posY_planeta-20 + planeta.getHeight());
         Rect aster = new Rect((int)e.posX, (int)e.posY, (int)e.posX + asteroide.getWidth(), (int)e.posY + asteroide.getHeight());
-
-        // TODO  true
         return Rect.intersects(planet, aster);
     }
 

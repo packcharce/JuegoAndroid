@@ -2,6 +2,7 @@ package com.juego.carlex.juegoandroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -29,6 +30,7 @@ public class ActividadJuego extends Activity {
             j.setVelocidad_planeta(30);
         else
             j.setVelocidad_planeta(10);
+        this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     private void hideSystemUI() {
